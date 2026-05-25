@@ -3,10 +3,11 @@
 import React from "react"
 
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { useTheme } from "next-themes"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
+import { useUser } from "@/hooks/use-user"
 import {
   LayoutDashboard,
   Upload,
@@ -29,12 +30,18 @@ const navItems = [
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
+  const router = useRouter()
   const { theme, setTheme } = useTheme()
   const [mobileOpen, setMobileOpen] = useState(false)
+  const { user, logout } = useUser()
+
+  const handleLogout = () => {
+    logout()
+    router.replace("/")
+  }
 
   return (
     <div className="flex min-h-screen">
-      {/* Desktop sidebar */}
       <aside className="hidden md:flex w-64 flex-col border-r border-border bg-card p-6">
         <Link href="/" className="flex items-center gap-2 mb-10">
           <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary">
@@ -66,11 +73,25 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           })}
         </nav>
 
+        {user && (
+          <div className="mt-6 border-t border-border pt-4">
+            <p className="text-xs uppercase tracking-[.18em] text-muted-foreground">
+              Signed in as
+            </p>
+            <div className="mt-2 flex items-center justify-between gap-3">
+              <span className="text-sm font-medium text-foreground">{user.name}</span>
+              <Button variant="ghost" size="sm" onClick={handleLogout}>
+                Logout
+              </Button>
+            </div>
+          </div>
+        )}
+
         <Button
           variant="ghost"
           size="icon"
           onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-          className="mt-auto self-start rounded-xl"
+          className="mt-6 self-start rounded-xl"
         >
           <Sun className="h-4 w-4 rotate-0 scale-100 transition-transform dark:-rotate-90 dark:scale-0" />
           <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-transform dark:rotate-0 dark:scale-100" />
@@ -78,7 +99,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </Button>
       </aside>
 
-      {/* Mobile nav */}
       <div className="md:hidden fixed top-0 left-0 right-0 z-50 flex items-center justify-between border-b border-border bg-card/90 backdrop-blur-xl px-4 py-3">
         <Link href="/" className="flex items-center gap-2">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
@@ -107,7 +127,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </div>
       </div>
 
-      {/* Mobile menu overlay */}
       {mobileOpen && (
         <div className="md:hidden fixed inset-0 z-40 bg-background/80 backdrop-blur-sm" onClick={() => setMobileOpen(false)}>
           <nav
@@ -137,7 +156,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </div>
       )}
 
-      {/* Main content */}
       <main className="flex-1 md:pt-0 pt-16 overflow-auto">
         <div className="mx-auto max-w-6xl p-6 md:p-8">
           {children}

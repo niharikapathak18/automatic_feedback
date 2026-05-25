@@ -156,12 +156,22 @@ export function useProgress() {
         const weekLabel = `Week ${Math.floor(prev.recentActivity.length / 3) + 1}`
         const lastPoint = prev.progressData[prev.progressData.length - 1]
         const newPoint: ProgressPoint = lastPoint
-          ? { ...lastPoint, week: weekLabel, [item.type === "essay" ? "essays" : item.type]: item.score }
-          : { week: weekLabel, essays: item.type === "essay" ? item.score : 50, coding: item.type === "coding" ? item.score : 50, maths: item.type === "maths" ? item.score : 50 }
-        const progressData =
-          prev.progressData.length === 0 || lastPoint?.week === weekLabel
-            ? [...prev.progressData.slice(0, -1), newPoint]
-            : [...prev.progressData, newPoint]
+  ? {
+      week: weekLabel,
+      essays: item.type === "essay" ? item.score : lastPoint.essays,
+      coding: item.type === "coding" ? item.score : lastPoint.coding,
+      maths: item.type === "maths" ? item.score : lastPoint.maths,
+    }
+  : {
+      week: weekLabel,
+      essays: item.type === "essay" ? item.score : 0,
+      coding: item.type === "coding" ? item.score : 0,
+      maths: item.type === "maths" ? item.score : 0,
+    }
+    const progressData =
+  prev.progressData.length === 0 || lastPoint?.week === weekLabel
+    ? [...prev.progressData.slice(0, -1), newPoint]
+    : [...prev.progressData, newPoint]
 
         // ── Heatmap (mark today) ──────────────────────────────────────────────
         const todayDow = (new Date().getDay() + 6) % 7 // Mon=0

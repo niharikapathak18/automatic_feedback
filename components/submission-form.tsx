@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { FeedbackDisplay } from "@/components/feedback-display"
+import { useProgress } from "@/hooks/use-progress"
 import {
   FileText,
   Code,
@@ -64,6 +65,7 @@ export function SubmissionForm() {
   const [feedback, setFeedback] = useState<FeedbackData | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const { submitAssignment } = useProgress()
 
   const handleSubmit = useCallback(async () => {
     if (!content.trim()) return
@@ -89,6 +91,12 @@ export function SubmissionForm() {
       }
 
       setFeedback(data)
+      submitAssignment({
+        type: selectedType as "essay" | "coding" | "maths",
+        title: `${selectedType} submission`,
+        score: data?.overallScore ?? 75,
+      })
+
     } catch (err) {
       console.error("Feedback error:", err)
       setError(

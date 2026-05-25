@@ -7,7 +7,7 @@ import { usePathname, useRouter } from "next/navigation"
 import { useTheme } from "next-themes"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { useUser } from "@/hooks/use-user"
+import { useAuth } from "@/context/auth-context"
 import {
   LayoutDashboard,
   Upload,
@@ -33,7 +33,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const router = useRouter()
   const { theme, setTheme } = useTheme()
   const [mobileOpen, setMobileOpen] = useState(false)
-  const { user, logout } = useUser()
+  const { user, logout } = useAuth()
 
   const handleLogout = () => {
     logout()

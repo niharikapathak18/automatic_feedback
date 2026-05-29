@@ -19,12 +19,6 @@ const iconMap = {
   maths: Calculator,
 }
 
-const typeLabels = {
-  essay: "Essay",
-  coding: "Coding",
-  maths: "Maths",
-}
-
 export function RecentActivity({ items }: { items: ActivityItem[] }) {
   return (
     <div className="rounded-2xl border border-border bg-card">

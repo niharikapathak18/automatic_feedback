@@ -2,15 +2,13 @@
 
 import { cn } from "@/lib/utils"
 
-const weeks = 12
 const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 
 function generateHeatmapData() {
   const data: number[][] = []
-  for (let w = 0; w < weeks; w++) {
+  for (let w = 0; w < 12; w++) {
     const week: number[] = []
     for (let d = 0; d < 7; d++) {
-      // More activity on weekdays, less on weekends
       const isWeekend = d >= 5
       const base = isWeekend ? 0.2 : 0.5
       const rand = Math.random()
@@ -24,7 +22,7 @@ function generateHeatmapData() {
   return data
 }
 
-const heatmapData = generateHeatmapData()
+const defaultHeatmapData = generateHeatmapData()
 
 function getIntensityClass(level: number) {
   switch (level) {
@@ -41,7 +39,7 @@ function getIntensityClass(level: number) {
   }
 }
 
-export function WeeklyHeatmap() {
+export function WeeklyHeatmap({ heatmapData = defaultHeatmapData }: { heatmapData?: number[][] }) {
   return (
     <div className="rounded-2xl border border-border bg-card p-6">
       <h3 className="text-lg font-semibold text-foreground">
@@ -52,7 +50,6 @@ export function WeeklyHeatmap() {
       </p>
 
       <div className="flex gap-2">
-        {/* Day labels */}
         <div className="flex flex-col gap-1 pt-6">
           {days.map((day) => (
             <div
@@ -64,7 +61,6 @@ export function WeeklyHeatmap() {
           ))}
         </div>
 
-        {/* Grid */}
         <div className="flex-1 overflow-x-auto">
           <div className="flex gap-1">
             {heatmapData.map((week, wi) => (
@@ -88,7 +84,6 @@ export function WeeklyHeatmap() {
         </div>
       </div>
 
-      {/* Legend */}
       <div className="flex items-center justify-end gap-2 mt-4">
         <span className="text-[10px] text-muted-foreground">Less</span>
         {[0, 1, 2, 3].map((level) => (

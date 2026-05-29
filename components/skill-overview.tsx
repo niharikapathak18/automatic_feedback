@@ -1,7 +1,6 @@
 "use client"
 
 import { cn } from "@/lib/utils"
-import { Progress } from "@/components/ui/progress"
 
 interface Skill {
   name: string
@@ -10,14 +9,14 @@ interface Skill {
   color: string
 }
 
-const skills: Skill[] = [
+const defaultSkills: Skill[] = [
   { name: "Essay Writing", level: 78, maxLevel: 100, color: "bg-chart-1" },
   { name: "Coding", level: 82, maxLevel: 100, color: "bg-chart-5" },
   { name: "Maths", level: 71, maxLevel: 100, color: "bg-chart-3" },
   { name: "Problem Solving", level: 58, maxLevel: 100, color: "bg-chart-4" },
 ]
 
-export function SkillOverview() {
+export function SkillOverview({ skills = defaultSkills }: { skills?: Skill[] }) {
   return (
     <div className="rounded-2xl border border-border bg-card p-6">
       <h3 className="text-lg font-semibold text-foreground">Skill Levels</h3>

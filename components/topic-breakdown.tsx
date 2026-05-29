@@ -10,7 +10,7 @@ interface Topic {
   submissions: number
 }
 
-const topics: Topic[] = [
+const defaultTopics: Topic[] = [
   { name: "Argumentative Writing", score: 85, change: 8, submissions: 6 },
   { name: "Binary Search & Sorting", score: 78, change: 12, submissions: 4 },
   { name: "Calculus Integration", score: 64, change: -3, submissions: 5 },
@@ -19,7 +19,7 @@ const topics: Topic[] = [
   { name: "Linear Algebra", score: 58, change: 2, submissions: 2 },
 ]
 
-export function TopicBreakdown() {
+export function TopicBreakdown({ topics = defaultTopics }: { topics?: Topic[] }) {
   return (
     <div className="rounded-2xl border border-border bg-card p-6">
       <h3 className="text-lg font-semibold text-foreground">

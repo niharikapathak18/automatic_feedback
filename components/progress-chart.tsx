@@ -10,7 +10,14 @@ import {
   YAxis,
 } from "recharts"
 
-const data = [
+interface ProgressPoint {
+  week: string
+  essays: number
+  coding: number
+  maths: number
+}
+
+const defaultData: ProgressPoint[] = [
   { week: "Week 1", essays: 62, coding: 55, maths: 48 },
   { week: "Week 2", essays: 68, coding: 60, maths: 52 },
   { week: "Week 3", essays: 71, coding: 65, maths: 58 },
@@ -40,7 +47,9 @@ function CustomTooltip({ active, payload, label }: { active?: boolean; payload?:
   )
 }
 
-export function ProgressChart() {
+export function ProgressChart({ data }: { data?: ProgressPoint[] }) {
+  const chartData = data ?? defaultData
+
   return (
     <div className="rounded-2xl border border-border bg-card p-6">
       <div className="flex items-center justify-between mb-6">
@@ -69,7 +78,7 @@ export function ProgressChart() {
       </div>
       <div className="h-[300px] w-full">
         <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={data}>
+          <AreaChart data={chartData}>
             <defs>
               <linearGradient id="essayGrad" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor="hsl(262, 80%, 55%)" stopOpacity={0.2} />

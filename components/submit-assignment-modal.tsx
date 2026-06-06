@@ -3,6 +3,8 @@
 import { useState } from "react"
 import { X, Send } from "lucide-react"
 import { useProgress } from "@/hooks/use-progress"
+import { useAuth } from "@/context/auth-context"
+import { writeSubmission } from "@/lib/db/writeSubmission"
 
 interface SubmitAssignmentModalProps {
   open: boolean
@@ -15,13 +17,16 @@ const TYPES = [
   { value: "maths",  label: "Maths" },
 ] as const
 
+
 export function SubmitAssignmentModal({ open, onClose }: SubmitAssignmentModalProps) {
-  const { submitAssignment } = useProgress()
+  const { refreshProgress } = useProgress()
+  const { user } = useAuth()
 
   const [title, setTitle] = useState("")
   const [type, setType] = useState<"essay" | "coding" | "maths">("essay")
   const [score, setScore] = useState("75")
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   if (!open) return null
 
@@ -30,14 +35,28 @@ export function SubmitAssignmentModal({ open, onClose }: SubmitAssignmentModalPr
     const scoreNum = Math.min(100, Math.max(0, parseInt(score, 10)))
     if (isNaN(scoreNum)) return
 
+    if (!user) { setError("Not authenticated"); return }
+
     setLoading(true)
-    // Simulate brief async (would be API call in production)
-    await new Promise((r) => setTimeout(r, 400))
-    submitAssignment({ title: title.trim(), type, score: scoreNum })
-    setLoading(false)
-    setTitle("")
-    setScore("75")
-    onClose()
+    setError(null)
+    try {
+      await writeSubmission({
+        userId: user.id,
+        type,
+        title: title.trim(),
+        content: "",
+        score: scoreNum,
+        model: "manual",
+      })
+      await refreshProgress()
+      setTitle("")
+      setScore("75")
+      onClose()
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to save. Try again.")
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -110,6 +129,9 @@ export function SubmitAssignmentModal({ open, onClose }: SubmitAssignmentModalPr
             </div>
           </div>
 
+          {error && (
+            <p className="text-xs text-destructive">{error}</p>
+          )}
           <button
             type="submit"
             disabled={loading || !title.trim()}

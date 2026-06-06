@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { FeedbackDisplay } from "@/components/feedback-display"
 import { useProgress } from "@/hooks/use-progress"
+import { useAuth } from "@/context/auth-context"
+import { writeSubmission } from "@/lib/db/writeSubmission"
 import {
   FileText,
   Code,
@@ -65,7 +67,8 @@ export function SubmissionForm() {
   const [feedback, setFeedback] = useState<FeedbackData | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const { submitAssignment } = useProgress()
+  const { refreshProgress } = useProgress()
+  const { user } = useAuth()
 
   const handleSubmit = useCallback(async () => {
     if (!content.trim()) return
@@ -91,11 +94,29 @@ export function SubmissionForm() {
       }
 
       setFeedback(data)
-      submitAssignment({
+
+      if (!user) {
+        setError("Not authenticated")
+        return
+      }
+
+      const submissionTitle = content.trim().slice(0, 60) || `${selectedType} submission`
+      await writeSubmission({
+        userId: user.id,
         type: selectedType as "essay" | "coding" | "maths",
-        title: `${selectedType} submission`,
-        score: data?.overallScore ?? 75,
+        title: submissionTitle,
+        content,
+        score: data.overallScore ?? 0,
+        letterGrade: data.letterGrade ?? "F",
+        summary: data.summary ?? "",
+        strengths: data.strengths ?? [],
+        improvements: data.improvements ?? [],
+        annotations: data.annotations ?? [],
+        weakTopics: data.weakTopics ?? [],
+        practiceRecommendations: data.practiceRecommendations ?? [],
+        model: "llama-3.3-70b-versatile",
       })
+      await refreshProgress()
 
     } catch (err) {
       console.error("Feedback error:", err)
@@ -105,7 +126,7 @@ export function SubmissionForm() {
     } finally {
       setIsLoading(false)
     }
-  }, [content, selectedType])
+  }, [content, selectedType, user, refreshProgress])
 
   const handleReset = () => {
     setContent("")

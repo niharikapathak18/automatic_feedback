@@ -1,5 +1,6 @@
 "use client"
 
+import { supabase } from "@/lib/supabase"
 import {
   createContext,
   useContext,
@@ -8,8 +9,6 @@ import {
   useCallback,
   type ReactNode,
 } from "react"
-
-
 
 export interface User {
   id: string
@@ -27,34 +26,8 @@ interface AuthContextValue {
     email: string,
     password: string
   ) => Promise<{ error?: string }>
-  logout: () => void
+  logout: () => Promise<void>
 }
-
-
-
-const USERS_KEY = "app:users"
-const SESSION_KEY = "app:session"
-
-function getUsers(): Record<string, { user: User; passwordHash: string }> {
-  try {
-    return JSON.parse(localStorage.getItem(USERS_KEY) ?? "{}")
-  } catch {
-    return {}
-  }
-}
-
-/** Very simple hash — fine for a local demo; swap for bcrypt on a real backend */
-async function simpleHash(value: string): Promise<string> {
-  const buf = await crypto.subtle.digest(
-    "SHA-256",
-    new TextEncoder().encode(value)
-  )
-  return Array.from(new Uint8Array(buf))
-    .map((b) => b.toString(16).padStart(2, "0"))
-    .join("")
-}
-
-
 
 const AuthContext = createContext<AuthContextValue | null>(null)
 
@@ -62,39 +35,47 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [isReady, setIsReady] = useState(false)
 
-  // Rehydrate session on mount
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem(SESSION_KEY)
-      if (raw) {
-        const saved: User = JSON.parse(raw)
-        setUser(saved)
+    const loadUser = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
+
+      const supabaseUser = session?.user
+      if (supabaseUser) {
+        setUser({
+          id: supabaseUser.id,
+          email: supabaseUser.email ?? "",
+          name: (supabaseUser.user_metadata?.name as string) ?? "",
+          createdAt: supabaseUser.created_at,
+        })
       }
-    } catch {
-      // ignore
-    } finally {
+
       setIsReady(true)
     }
+
+    loadUser()
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      const authUser = session?.user
+
+      if (!authUser) {
+        setUser(null)
+        return
+      }
+
+      setUser({
+        id: authUser.id,
+        email: authUser.email ?? "",
+        name: (authUser.user_metadata?.name as string) ?? "",
+        createdAt: authUser.created_at,
+      })
+    })
+
+    return () => subscription.unsubscribe()
   }, [])
-
-  const login = useCallback(
-    async (email: string, password: string): Promise<{ error?: string }> => {
-      const users = getUsers()
-      const key = email.toLowerCase()
-      const entry = users[key]
-
-      if (!entry) return { error: "No account found with that email." }
-
-      const hash = await simpleHash(password)
-      if (hash !== entry.passwordHash)
-        return { error: "Incorrect password." }
-
-      setUser(entry.user)
-      localStorage.setItem(SESSION_KEY, JSON.stringify(entry.user))
-      return {}
-    },
-    []
-  )
 
   const register = useCallback(
     async (
@@ -102,34 +83,59 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       email: string,
       password: string
     ): Promise<{ error?: string }> => {
-      const users = getUsers()
-      const key = email.toLowerCase()
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            name,
+          },
+        },
+      })
 
-      if (users[key]) return { error: "An account with that email already exists." }
-
-      const newUser: User = {
-        id: crypto.randomUUID(),
-        email: email.toLowerCase(),
-        name,
-        createdAt: new Date().toISOString(),
+      if (error) {
+        return { error: error.message }
       }
-
-      const hash = await simpleHash(password)
-      users[key] = { user: newUser, passwordHash: hash }
-      localStorage.setItem(USERS_KEY, JSON.stringify(users))
 
       return {}
     },
     []
   )
 
-  const logout = useCallback(() => {
+  const login = useCallback(
+    async (
+      email: string,
+      password: string
+    ): Promise<{ error?: string }> => {
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      })
+
+      if (error) {
+        return { error: error.message }
+      }
+
+      return {}
+    },
+    []
+  )
+
+  const logout = useCallback(async () => {
+    await supabase.auth.signOut()
     setUser(null)
-    localStorage.removeItem(SESSION_KEY)
   }, [])
 
   return (
-    <AuthContext.Provider value={{ user, isReady, login, register, logout }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        isReady,
+        login,
+        register,
+        logout,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   )
@@ -137,6 +143,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 export function useAuth() {
   const ctx = useContext(AuthContext)
-  if (!ctx) throw new Error("useAuth must be used inside <AuthProvider>")
+
+  if (!ctx) {
+    throw new Error("useAuth must be used inside <AuthProvider>")
+  }
+
   return ctx
 }

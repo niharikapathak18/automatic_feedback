@@ -23,7 +23,7 @@ export function StatCard({
   return (
     <div
       className={cn(
-        "group relative rounded-2xl border border-border bg-card p-6 transition-all hover:border-primary/30 hover:glow-primary",
+        "group relative rounded-2xl border border-border bg-card p-6 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:shadow-primary/10",
         className
       )}
     >
@@ -52,7 +52,17 @@ export function StatCard({
             <span className="text-xs text-muted-foreground">{subtitle}</span>
           </div>
         </div>
-        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary transition-colors group-hover:bg-primary/20">
+        <div className="
+        flex
+        h-12
+        w-12
+        items-center
+        justify-center
+        rounded-2xl
+        bg-gradient-to-br
+        from-primary/20
+        to-accent-20
+        text-primary">
           <Icon className="h-5 w-5" />
         </div>
       </div>

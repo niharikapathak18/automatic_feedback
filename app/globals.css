@@ -8,6 +8,21 @@
   }
 }
 
+body {
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(124, 58, 237, 0.12),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at bottom left,
+      rgba(236, 72, 153, 0.08),
+      transparent 30%
+    );
+}
+
+
 @layer base {
   :root {
     --background: 40 20% 98%;
@@ -49,7 +64,7 @@
     --warning-foreground: 240 10% 8%;
   }
   .dark {
-    --background: 240 12% 6%;
+    --background: 240 12% 9%;   
     --foreground: 40 10% 95%;
     --card: 240 12% 9%;
     --card-foreground: 40 10% 95%;
@@ -73,7 +88,7 @@
     --chart-3: 170 60% 50%;
     --chart-4: 40 90% 65%;
     --chart-5: 200 70% 60%;
-    --sidebar-background: 240 12% 8%;
+    --sidebar-background: 240 12% 9%;
     --sidebar-foreground: 40 10% 95%;
     --sidebar-primary: 262 80% 65%;
     --sidebar-primary-foreground: 0 0% 100%;

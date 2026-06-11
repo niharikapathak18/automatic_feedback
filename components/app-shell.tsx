@@ -3,6 +3,7 @@
 import React from "react"
 
 import Link from "next/link"
+import { motion } from "framer-motion"
 import { usePathname, useRouter } from "next/navigation"
 import { useTheme } from "next-themes"
 import { cn } from "@/lib/utils"
@@ -42,14 +43,66 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex min-h-screen">
-      <aside className="hidden md:flex w-64 flex-col border-r border-border bg-card p-6">
-        <Link href="/" className="flex items-center gap-2 mb-10">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary">
-            <Sparkles className="h-5 w-5 text-primary-foreground" />
+      <div className="fixed inset-0 -z-10 overflow-hidden">
+  <motion.div
+    className="absolute left-20 top-20 h-72 w-72 rounded-full bg-primary/10 blur-3xl"
+    animate={{
+      x: [0, 100, 0],
+      y: [0, -60, 0],
+    }}
+    transition={{
+      duration: 20,
+      repeat: Infinity,
+      ease: "linear",
+    }}
+  />
+
+  <motion.div
+    className="absolute right-20 bottom-20 h-96 w-96 rounded-full bg-blue-500/10 blur-3xl"
+    animate={{
+      x: [0, -120, 0],
+      y: [0, 100, 0],
+    }}
+    transition={{
+      duration: 25,
+      repeat: Infinity,
+      ease: "linear",
+    }}
+  />
+</div>
+      <aside className="hidden md:flex w-72 flex-col border-r border-border bg-card p-6">
+        <Link href="/" className="mb-10 block">
+          <div className="flex items-center gap-2">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary">
+              <Sparkles className="h-5 w-5 text-primary-foreground" />
+            </div>
+
+            <span className="text-xl font-bold tracking-tight text-foreground">
+              BrainDrop
+            </span>
           </div>
-          <span className="text-xl font-bold tracking-tight text-foreground">
-            BrainDrop
-          </span>
+
+          <div className="ml-11 mt-2">
+            <span
+              className="
+              inline-flex
+              rounded-full
+              border
+              border-primary/20
+              bg-gradient-to-r
+              from-primary/15
+              to-primary/5
+              px-3
+              py-1
+              text-[10px]
+              font-semibold
+              tracking-[0.2em]
+              text-primary
+              "
+            >
+              AI POWERED
+            </span>
+          </div>
         </Link>
 
         <nav className="flex flex-col gap-1 flex-1">
@@ -100,11 +153,38 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </aside>
 
       <div className="md:hidden fixed top-0 left-0 right-0 z-50 flex items-center justify-between border-b border-border bg-card/90 backdrop-blur-xl px-4 py-3">
-        <Link href="/" className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-            <Sparkles className="h-4 w-4 text-primary-foreground" />
+        <Link href="/" className="mb-10 block">
+          <div className="flex items-center gap-2">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary">
+              <Sparkles className="h-5 w-5 text-primary-foreground" />
+            </div>
+
+            <span className="text-xl font-bold tracking-tight text-foreground">
+              BrainDrop
+            </span>
           </div>
-          <span className="text-lg font-bold text-foreground">BrainDrop</span>
+
+          <div className="ml-11 mt-2">
+            <span
+              className="
+              inline-flex
+              rounded-full
+              border
+              border-primary/20
+              bg-gradient-to-r
+              from-primary/15
+              to-primary/5
+              px-3
+              py-1
+              text-[10px]
+              font-semibold
+              tracking-[0.2em]
+              text-primary
+              "
+            >
+              AI POWERED
+            </span>
+          </div>
         </Link>
         <div className="flex items-center gap-2">
           <Button

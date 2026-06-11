@@ -1,7 +1,7 @@
 "use client"
 
 import { cn } from "@/lib/utils"
-
+import { motion } from "framer-motion"
 interface Skill {
   name: string
   level: number
@@ -30,14 +30,31 @@ export function SkillOverview({ skills = defaultSkills }: { skills?: Skill[] }) 
               <span className="text-sm font-medium text-foreground">
                 {skill.name}
               </span>
-              <span className="text-sm font-mono font-bold text-muted-foreground">
+              <span className="
+              rounded-full
+              bg-primary/10
+              px-3
+              py-1
+              text-xs
+              font-semibold
+              text-primary
+            ">
                 {skill.level}%
               </span>
             </div>
             <div className="relative h-2.5 w-full rounded-full bg-secondary">
-              <div
-                className={cn("h-full rounded-full transition-all duration-700", skill.color)}
-                style={{ width: `${(skill.level / skill.maxLevel) * 100}%` }}
+              <motion.div
+                initial={{ width: 0 }}
+                animate={{
+                  width: `${(skill.level / skill.maxLevel) * 100}%`,
+                }}
+                transition={{
+                  duration: 1,
+                }}
+                className={cn(
+                  "h-full rounded-full",
+                  skill.color
+                )}
               />
             </div>
           </div>

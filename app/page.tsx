@@ -13,7 +13,7 @@ import { RecentActivity } from "@/components/recent-activity"
 import { SkillOverview } from "@/components/skill-overview"
 import { StreakCard } from "@/components/streak-card"
 import { FileCheck, TrendingUp, Target, Clock } from "lucide-react"
-
+import { motion } from "framer-motion"
 import { useAuth } from "@/context/auth-context"
 import { useProgress } from "@/hooks/use-progress"
 
@@ -53,7 +53,12 @@ const improvement =
 
   return (
     <AppShell>
-      <div className="flex flex-col gap-8">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="flex flex-col gap-8"
+      >
 
         {/* Header */}
         <div>
@@ -112,7 +117,7 @@ const improvement =
           </div>
         </div>
 
-      </div>
+      </motion.div>
     </AppShell>
   )
 }

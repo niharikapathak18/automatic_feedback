@@ -6,7 +6,7 @@ import { PracticeMode } from "@/components/practice-mode"
 export default function PracticePage() {
   return (
     <AppShell>
-      <div className="flex flex-col gap-8">
+      <div className="rounded-3xl border bg-gradient-to-r from-primary/20 to-accent/20 p-8">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-foreground text-balance">
             Practice Mode
